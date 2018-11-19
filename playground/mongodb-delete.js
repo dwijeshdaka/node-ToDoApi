@@ -13,19 +13,19 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', {useNewUrlParser: true 
     console.log('Connected to mongodb');
     const db = client.db('TodoApp');
 
-    db.collection('Todos').find({completed:'false'}).toArray().then((docs)=>{
-        console.log('ToDos');
-        console.log(JSON.stringify(docs,undefined,2));
-    },(err) => {
-        console.log('unable to fetch todos',err);
-    });
+    /*deleteMany 
+    db.collection('Todos').deleteMany({text:'something'}).then((result)=>{
+        console.log(result);
+    }); */
 
-    db.collection('Todos').count().then((count)=>{
-        console.log(`ToDos count ${count}`);
-    },(err) => {
-        console.log('unable to fetch todos',err);
+    /*deleteOne
+    db.collection('Todos').deleteOne({text:'something'}).then((result)=>{
+        console.log(result);
+    }); */
+    //findOneAndDelete -- deletes and returns deleted object
+    db.collection('Todos').findOneAndDelete({text:'something'}).then((result)=>{
+        console.log(result);
     });
-
-  
-    client.close();
+        
+    //client.close();
 });
