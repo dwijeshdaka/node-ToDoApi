@@ -92,10 +92,48 @@ describe('Get /todos/:id',()=>{
             .end(done);
     });
 
-    it('Should return a 404 error for npn-object ids',(done)=>{
+    it('Should return a 404 error for non-object ids',(done)=>{
         
         request(app)
             .get(`/todos/123`)
+            .expect(404)
+            .end(done);
+    });
+});
+
+describe('DELETE /todos/id:',()=>{
+    it('Should remove a todo by ID',(done)=>{
+        var hexID = todos[1]._id.toHexString();
+
+        request(app)
+            .delete(`/todos/${hexID}`)
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.todo._id).toBe(hexID)
+            }).end((err,res)=>{
+                if(err){
+                    return done(err);
+                }
+                Todo.findById(hexID).then((todo)=>{
+                    expect(!todo);
+                    done();
+                }).catch((err)=>done(err));
+            });
+    });
+
+    it('Should return a 404 error if todo not found',(done)=>{
+        var hexID = new ObjectID().toHexString();
+
+        request(app)
+            .delete(`/todos/${hexID}`)
+            .expect(404)
+            .end(done);
+    });
+
+    it('Should return a 404 error for non-object ids',(done)=>{
+        
+        request(app)
+            .delete(`/todos/123`)
             .expect(404)
             .end(done);
     });
