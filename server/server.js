@@ -143,12 +143,24 @@ app.post('/users/login', (req, res) => {
     }).catch((e) => {
       res.status(404).send('Invalid Credentials');
     });
-  });
+});
+
+
+app.delete('/users/me/token',authenticate,(req,res)=>{
+    req.user.removeToken(req.token).then(()=>{
+        res.status(200).send();
+    }),()=>{
+        res.status(404).send();
+    }
+});  
 
 if(!module.parent) {
     app.listen(port,()=>{
         console.log(`Started on port ${port}`);
     });    
 }
+
+
+
 
 module.exports={app};
