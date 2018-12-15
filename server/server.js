@@ -2,6 +2,7 @@ require('./config/config');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
 
@@ -11,6 +12,7 @@ var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
 
 const port= process.env.PORT || 3000;
 
@@ -23,9 +25,11 @@ app.post('/todos',(req,res)=>{
     var todo = new Todo({
         text: req.body.text
     });
+    
 
     todo.save().then((doc) => {
         res.send(doc);
+        console.log(doc);
     },(err)=>{
         res.status(400).send(err);
     });
@@ -98,7 +102,7 @@ app.patch('/todos/:id',(req,res)=>{
 
 
 app.post('/users',(req,res)=>{
-    var body = _.pick(req.body,['email','password']);
+    var body = _.pick(req.body,['email','password','name']);
     var user = new User(body);
     console.log(body);
 
@@ -118,17 +122,26 @@ app.get('/users/me',authenticate,(req,res)=>{
        res.send(req.user);
 });
 
+app.get('/', function (req, res) {
+    res.sendFile(__dirname+'/index.html');
+});
+
 
 // POST /users/login {email, password}
 app.post('/users/login', (req, res) => {
+    
     var body = _.pick(req.body, ['email', 'password']);
+    
+    //res.send(body.email + ' Submitted Successfully!');
+    
+   // console.log(req);
   
     User.findByCredentials(body.email, body.password).then((user) => {
       return user.generateAuthToken().then((token) => {
-        res.header('x-auth', token).send(user);
+        res.header('x-auth', token).send('welcome '+user.tokens);
       });
     }).catch((e) => {
-      res.status(404).send();
+      res.status(404).send('Invalid Credentials');
     });
   });
 
@@ -136,6 +149,6 @@ if(!module.parent) {
     app.listen(port,()=>{
         console.log(`Started on port ${port}`);
     });    
- }
+}
 
 module.exports={app};

@@ -26,6 +26,11 @@ var UserSchema = new mongoose.Schema({
         required: true,
         minLength: 6
     },
+    name:{
+        type: String,
+       // required: true,
+        minLength: 6
+    },
     tokens:[{
         access:{
             type: String,
@@ -91,8 +96,10 @@ UserSchema.statics.findByCredentials = function (email, password) {
         // Use bcrypt.compare to compare password and user.password
         bcrypt.compare(password, user.password, (err, res) => {
           if (res) {
-            resolve(user);
-          } else {
+                resolve(user);
+                //console.log(user.tokens);
+            } 
+            else {
             reject();
           }
         });
@@ -115,6 +122,7 @@ UserSchema.pre('save',function(next){
         next();
     }
 });
+
 
 
 var User = mongoose.model('User',UserSchema);
